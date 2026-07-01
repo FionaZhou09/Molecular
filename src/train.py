@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 
 from src.config import resolve_project_path
@@ -7,6 +9,12 @@ from src.featurize import build_feature_matrix
 from src.models import create_model
 from src.splits import compute_scaffold, random_split, scaffold_split
 
+
+BENCHMARK_DATASETS = ("esol", "freesolv")
+BENCHMARK_FEATURE_TYPES = ("descriptors", "fingerprints", "combined")
+BENCHMARK_MODEL_KEYS = ("ridge", "lasso", "random_forest", "xgboost", "mlp")
+BENCHMARK_SPLIT_TYPES = ("random", "scaffold")
+BENCHMARK_SEEDS = (0, 1, 2, 3, 4)
 
 PREDICTION_COLUMNS = [
     "dataset",
@@ -21,6 +29,35 @@ PREDICTION_COLUMNS = [
     "residual",
     "scaffold",
 ]
+
+
+def build_benchmark_plan(
+    datasets=BENCHMARK_DATASETS,
+    feature_types=BENCHMARK_FEATURE_TYPES,
+    model_keys=BENCHMARK_MODEL_KEYS,
+    split_types=BENCHMARK_SPLIT_TYPES,
+    seeds=BENCHMARK_SEEDS,
+) -> pd.DataFrame:
+    rows = []
+    for dataset_key in datasets:
+        for feature_type in feature_types:
+            for model_key in model_keys:
+                for split_type in split_types:
+                    for seed in seeds:
+                        rows.append(
+                            {
+                                "dataset": dataset_key,
+                                "feature_type": feature_type,
+                                "model_key": model_key,
+                                "split_type": split_type,
+                                "seed": int(seed),
+                            }
+                        )
+
+    return pd.DataFrame(
+        rows,
+        columns=["dataset", "feature_type", "model_key", "split_type", "seed"],
+    )
 
 
 def _load_processed_dataset(dataset_key: str) -> pd.DataFrame:
@@ -144,3 +181,65 @@ def run_experiment(
     )
 
     return result, predictions
+
+
+def _write_csv(df: pd.DataFrame, path) -> None:
+    output_path = resolve_project_path(Path(path))
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(output_path, index=False)
+
+
+def run_benchmark_matrix(
+    datasets=BENCHMARK_DATASETS,
+    feature_types=BENCHMARK_FEATURE_TYPES,
+    model_keys=BENCHMARK_MODEL_KEYS,
+    split_types=BENCHMARK_SPLIT_TYPES,
+    seeds=BENCHMARK_SEEDS,
+    results_path=None,
+    predictions_path=None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    plan = build_benchmark_plan(
+        datasets=datasets,
+        feature_types=feature_types,
+        model_keys=model_keys,
+        split_types=split_types,
+        seeds=seeds,
+    )
+
+    result_rows = []
+    prediction_tables = []
+    for config in plan.to_dict("records"):
+        try:
+            result, predictions = run_experiment(
+                dataset_key=config["dataset"],
+                feature_type=config["feature_type"],
+                model_key=config["model_key"],
+                split_type=config["split_type"],
+                seed=config["seed"],
+            )
+        except Exception as exc:
+            message = (
+                "Benchmark experiment failed for "
+                f"dataset={config['dataset']}, "
+                f"feature_type={config['feature_type']}, "
+                f"model_key={config['model_key']}, "
+                f"split_type={config['split_type']}, "
+                f"seed={config['seed']}"
+            )
+            raise RuntimeError(message) from exc
+
+        result_rows.append(result)
+        prediction_tables.append(predictions)
+
+    results = pd.DataFrame(result_rows)
+    if prediction_tables:
+        predictions = pd.concat(prediction_tables, ignore_index=True)
+    else:
+        predictions = pd.DataFrame(columns=PREDICTION_COLUMNS)
+
+    if results_path is not None:
+        _write_csv(results, results_path)
+    if predictions_path is not None:
+        _write_csv(predictions, predictions_path)
+
+    return results, predictions

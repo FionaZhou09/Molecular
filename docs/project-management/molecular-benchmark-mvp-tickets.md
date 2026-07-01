@@ -207,7 +207,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-011 - Add Benchmark Matrix Runner And Summary
 
-- **Status note:** Ready to start. MOL-MVP-010 is complete.
+- **Status:** Complete. Benchmark matrix runner, predictions artifact, summary aggregation, CSV outputs, smoke mode, and tests were accepted by review.
 - **Background:** Produce the main benchmark table for random vs scaffold comparison.
 - **Owner role:** SWE
 - **Reviewer role:** ML Reviewer
@@ -222,6 +222,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-012 - Add Benchmark Notebook And Prediction Plots
 
+- **Status note:** Ready to start. MOL-MVP-011 is complete.
 - **Background:** Convert benchmark outputs into reviewer-friendly visuals.
 - **Owner role:** SWE
 - **Reviewer role:** ML Reviewer

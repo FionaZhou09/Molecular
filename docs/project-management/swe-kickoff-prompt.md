@@ -11,7 +11,7 @@ Read these files before starting:
 2. `/Users/yingzhou/Documents/Molecular/docs/superpowers/plans/2026-07-01-molecular-property-prediction-benchmark.md`
 3. `/Users/yingzhou/Documents/Molecular/docs/project-management/molecular-benchmark-mvp-tickets.md`
 
-MOL-MVP-001 through MOL-MVP-010 are considered complete. Start with **MOL-MVP-011** only unless the manager explicitly assigns a different ticket.
+MOL-MVP-001 through MOL-MVP-011 are considered complete. Start with **MOL-MVP-012** only unless the manager explicitly assigns a different ticket.
 
 Execution rules:
 - Implement one ticket at a time.
@@ -49,18 +49,19 @@ MVP order:
 14. MOL-MVP-013 - Add chemical space split visualization
 15. MOL-MVP-014 - Write README and reproducibility pass
 
-For MOL-MVP-011, do this:
-- Modify `src/train.py` if needed.
-- Create `scripts/run_benchmark.py` and `scripts/summarize_results.py`.
-- Add or extend tests, preferably `tests/test_train.py`.
-- Full benchmark matrix should support datasets `esol,freesolv`, feature types `descriptors,fingerprints,combined`, models `ridge,lasso,random_forest,xgboost,mlp`, split types `random,scaffold`, and seeds `0,1,2,3,4`.
-- Write `results/benchmark_results.csv`, `results/predictions.csv`, and `results/benchmark_summary.csv`.
-- `benchmark_results.csv` should have one row per dataset-feature-model-split-seed combination.
-- `predictions.csv` should append validation/test prediction rows from `run_experiment`.
-- `benchmark_summary.csv` should group by dataset, feature type, model, and split type, with mean and std for RMSE, MAE, and R2 across seeds.
-- Failed experiments must be surfaced clearly, not silently skipped.
-- Add a smoke mode / dry-run option so tests do not run the full expensive benchmark.
-- Run `python -m pytest tests/test_train.py -v` and `python -m pytest`.
-- Report changed files, benchmark matrix, output schemas, smoke/dry-run command, test command, test result, and blockers.
+For MOL-MVP-012, do this:
+- Modify `src/visualize.py` as needed.
+- Create `notebooks/02_benchmark.ipynb`.
+- Use `results/benchmark_results.csv`, `results/benchmark_summary.csv`, and `results/predictions.csv`.
+- Notebook should show random vs scaffold benchmark comparison.
+- Add predicted-vs-actual scatter plots with identity line.
+- Add residual distribution plots.
+- Save at least one predicted-vs-actual figure for ESOL and one for FreeSolv using filenames like `results/figures/predicted_vs_actual_<dataset>_<model>_<split>.png`.
+- Figure titles/labels must include dataset/model/split.
+- Notebook should run top-to-bottom.
+- Prefer using existing predictions CSV; do not rerun the full benchmark unless necessary.
+- Run `python -m pytest`.
+- Verify figure files exist and are non-empty.
+- Report changed files, generated figures, dataset/model/split combinations, test command, test result, notebook execution status, and blockers.
 
-Do not implement notebooks, prediction plots, chemical space visualization, or README polish in MOL-MVP-011.
+Do not implement chemical space visualization, README polish, SHAP, or error analysis in MOL-MVP-012.

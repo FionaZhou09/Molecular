@@ -27,75 +27,65 @@ GitHub repo：
 - MOL-MVP-008 已完成并通过 review；`src/models.py` 已有 classical model registry。
 - MOL-MVP-009 已完成并通过 review；`src/models.py` 已有 PyTorch MLP regressor。
 - MOL-MVP-010 已完成并通过 review；`src/evaluate.py` 和 `src/train.py` 已有 metrics 与 single experiment runner。
+- MOL-MVP-011 已完成并通过 review；benchmark results、predictions、summary CSV 已在 `results/`。
 - 当前目录已连接 GitHub，但不要 commit，除非 manager 明确要求。
 
 你的任务：
 
-只执行 **MOL-MVP-011 - Add Benchmark Matrix Runner And Summary**。
+只执行 **MOL-MVP-012 - Add Benchmark Notebook And Prediction Plots**。
 
-不要做后续 ticket。不要实现 notebooks、prediction plots、chemical space visualization 或 README polish。
+不要做后续 ticket。不要实现 chemical space visualization、README polish、SHAP 或 error analysis。
 
-MOL-MVP-011 要求：
+MOL-MVP-012 要求：
 
-- Modify `src/train.py` if needed.
-- Create `scripts/run_benchmark.py`.
-- Create `scripts/summarize_results.py`.
-- Add or extend tests, preferably `tests/test_train.py`, for benchmark matrix smoke/dry-run and summary aggregation.
-- Full benchmark matrix should support:
-  - datasets: `esol`, `freesolv`
-  - feature types: `descriptors`, `fingerprints`, `combined`
-  - models: `ridge`, `lasso`, `random_forest`, `xgboost`, `mlp`
-  - split types: `random`, `scaffold`
-  - seeds: `0`, `1`, `2`, `3`, `4`
-- Output files:
+- Modify `src/visualize.py` as needed.
+- Create `notebooks/02_benchmark.ipynb`.
+- Use existing outputs:
   - `results/benchmark_results.csv`
   - `results/benchmark_summary.csv`
   - `results/predictions.csv`
-- `benchmark_results.csv` should have one row per dataset-feature-model-split-seed experiment.
-- `predictions.csv` should append validation/test prediction rows from `run_experiment`.
-- `benchmark_summary.csv` should group by dataset, feature type, model, and split type.
-- Summary should compute mean and standard deviation for RMSE, MAE, and R2 across seeds.
-- Failed experiments must be surfaced clearly, not silently skipped.
-- Add a smoke mode / dry-run option so tests do not run the full expensive matrix.
-- Do not require full five-seed benchmark execution inside unit tests.
+- Notebook should show random vs scaffold summary.
+- Add predicted-vs-actual scatter plot with identity line.
+- Add residual distribution plot.
+- At minimum, output one predicted-vs-actual figure for ESOL and one for FreeSolv.
+- Use output filenames like:
+  - `results/figures/predicted_vs_actual_<dataset>_<model>_<split>.png`
+  - optionally `results/figures/residuals_<dataset>_<model>_<split>.png`
+- Figure labels/titles must include dataset/model/split.
+- Notebook should run top-to-bottom.
+- Do not rerun the full benchmark unless necessary; use `results/predictions.csv` where possible.
 
 执行流程：
 
 1. 检查当前 repo 状态和已有文件。
-2. 阅读 `src/train.py` 和 existing `run_experiment` return structure。
-3. 实现 MOL-MVP-011。
+2. 阅读 `results/benchmark_summary.csv` 和 `results/predictions.csv` schema。
+3. 实现 MOL-MVP-012。
 4. 运行：
-
-```bash
-python -m pytest tests/test_train.py -v
-```
-
-5. 运行完整测试：
 
 ```bash
 python -m pytest
 ```
+
+5. 验证 notebook 或 figure generation；如果用 notebook，至少确认它可以执行到生成 figures。
 
 6. 不要 commit，除非我明确要求。
 
 完成后请汇报：
 
 - 你创建或修改了哪些文件。
-- benchmark runner 参数/矩阵。
-- summary aggregation schema。
-- smoke/dry-run 用法。
+- notebook 生成了哪些图。
+- 使用了哪些 dataset/model/split 组合。
 - 运行了什么测试命令。
 - 测试结果是什么。
 - 是否有 blocker。
-- 下一步建议是否进入 MOL-MVP-012 和/或 MOL-MVP-013。
+- 下一步建议是否进入 MOL-MVP-013。
 
 验收标准：
 
-- `pytest tests/test_train.py -v` passes。
 - `python -m pytest` passes。
-- Benchmark runner can write `results/benchmark_results.csv`。
-- Benchmark runner can write `results/predictions.csv`。
-- Summary script can write `results/benchmark_summary.csv`。
-- Summary supports direct random-vs-scaffold comparison by grouped mean/std。
-- Smoke/dry-run test avoids full expensive benchmark。
-- 没有实现超出 MOL-MVP-011 范围的业务代码。
+- `notebooks/02_benchmark.ipynb` exists and can run top-to-bottom。
+- Notebook shows side-by-side or otherwise clear random vs scaffold comparison。
+- At least ESOL and FreeSolv each have one predicted-vs-actual figure。
+- Residual distributions are generated or shown。
+- Figure files exist and are non-empty。
+- 没有实现超出 MOL-MVP-012 范围的业务代码。
