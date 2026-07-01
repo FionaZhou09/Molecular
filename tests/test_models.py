@@ -3,7 +3,7 @@ import pytest
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from src.models import MODEL_KEYS, create_model
+from src.models import MODEL_KEYS, MLPRegressorTorch, create_model
 
 
 def _tiny_regression_data():
@@ -23,6 +23,15 @@ def _tiny_regression_data():
 
 
 def _model_kwargs(model_key):
+    if model_key == "mlp":
+        return {
+            "hidden_layers": (8,),
+            "dropout": 0.0,
+            "batch_size": 3,
+            "epochs": 120,
+            "learning_rate": 0.05,
+            "patience": 30,
+        }
     if model_key == "xgboost":
         return {"n_estimators": 5, "max_depth": 2, "verbosity": 0}
     if model_key == "random_forest":
@@ -35,7 +44,7 @@ def _model_kwargs(model_key):
 
 
 def test_model_registry_keys_are_stable():
-    assert MODEL_KEYS == ("ridge", "lasso", "random_forest", "xgboost")
+    assert MODEL_KEYS == ("ridge", "lasso", "random_forest", "xgboost", "mlp")
 
 
 @pytest.mark.parametrize("model_key", MODEL_KEYS)
@@ -87,9 +96,62 @@ def test_random_state_is_applied_to_seeded_models():
     assert xgb.random_state == 123
 
 
+def test_mlp_training_reduces_loss_on_tiny_dataset():
+    X, y = _tiny_regression_data()
+    model = MLPRegressorTorch(
+        hidden_layers=(16,),
+        dropout=0.0,
+        batch_size=3,
+        epochs=150,
+        learning_rate=0.05,
+        seed=123,
+        patience=40,
+    )
+
+    model.fit(X, y)
+    predictions = model.predict(X)
+
+    assert predictions.shape == (len(y),)
+    assert np.isfinite(predictions).all()
+    assert model.training_history_["final_loss"] < model.training_history_["initial_loss"]
+
+
+def test_mlp_seed_is_stored_for_reproducible_training():
+    model = create_model(
+        "mlp",
+        feature_type="fingerprints",
+        seed=123,
+        hidden_layers=(8,),
+        epochs=5,
+    )
+
+    assert model.seed == 123
+
+
+def test_mlp_descriptor_pipeline_fits_and_predicts():
+    X, y = _tiny_regression_data()
+    model = create_model(
+        "mlp",
+        feature_type="descriptors",
+        seed=123,
+        hidden_layers=(8,),
+        dropout=0.0,
+        batch_size=3,
+        epochs=80,
+        learning_rate=0.05,
+        patience=20,
+    )
+
+    model.fit(X, y)
+    predictions = model.predict(X)
+
+    assert predictions.shape == (len(y),)
+    assert np.isfinite(predictions).all()
+
+
 def test_create_model_rejects_unknown_model_key():
     with pytest.raises(ValueError, match="Unsupported model_key"):
-        create_model("mlp", feature_type="fingerprints", seed=123)
+        create_model("svm", feature_type="fingerprints", seed=123)
 
 
 def test_create_model_rejects_unknown_feature_type():

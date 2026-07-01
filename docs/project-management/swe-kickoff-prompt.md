@@ -11,7 +11,7 @@ Read these files before starting:
 2. `/Users/yingzhou/Documents/Molecular/docs/superpowers/plans/2026-07-01-molecular-property-prediction-benchmark.md`
 3. `/Users/yingzhou/Documents/Molecular/docs/project-management/molecular-benchmark-mvp-tickets.md`
 
-MOL-MVP-001 through MOL-MVP-008 are considered complete. Start with **MOL-MVP-009** only unless the manager explicitly assigns a different ticket.
+MOL-MVP-001 through MOL-MVP-009 are considered complete. Start with **MOL-MVP-010** only unless the manager explicitly assigns a different ticket.
 
 Execution rules:
 - Implement one ticket at a time.
@@ -49,18 +49,18 @@ MVP order:
 14. MOL-MVP-013 - Add chemical space split visualization
 15. MOL-MVP-014 - Write README and reproducibility pass
 
-For MOL-MVP-009, do this:
-- Modify `src/models.py`.
-- Extend `tests/test_models.py`.
-- Implement `MLPRegressorTorch` with hidden layers, dropout, batch size, epochs, learning rate, seed, and early stopping.
-- MLP must expose `fit(X_train, y_train)` and `predict(X_test)`.
-- Add `mlp` to `create_model(model_key, feature_type, seed, **kwargs)`.
-- Keep CPU training working on small datasets.
-- Add deterministic seed handling for numpy/torch where relevant.
-- Add smoke tests for MLP fit/predict on a tiny synthetic regression dataset.
-- Add test that prediction shape is `(n_samples,)`.
-- Add test or assertion that training reduces loss or final loss is lower than initial loss on the tiny dataset.
-- Run `python -m pytest tests/test_models.py -v` and `python -m pytest`.
-- Report changed files, MLP interface, seed/early-stopping behavior, test command, test result, and blockers.
+For MOL-MVP-010, do this:
+- Create `src/evaluate.py` and `src/train.py`.
+- Create `tests/test_evaluate.py` and `tests/test_train.py`.
+- Implement RMSE, MAE, and R2 metrics matching scikit-learn definitions.
+- Implement `evaluate_regression(y_true, y_pred) -> dict`.
+- Implement `run_experiment(dataset_key, feature_type, model_key, split_type, seed)`.
+- `run_experiment` should load processed data, create split, build features, train model, evaluate validation/test, return a flat result dictionary, and return or expose validation/test prediction rows.
+- Result dict must trace `dataset`, `feature_type`, `model_key`, `split_type`, `seed`, metrics, and split sizes.
+- Prediction rows must include `dataset`, `feature_type`, `model_key`, `split_type`, `seed`, `split`, `smiles`, `target`, `prediction`, `residual`, and `scaffold`.
+- Add tests with known metric values.
+- Add an end-to-end smoke test for one ESOL Ridge descriptor experiment.
+- Run `python -m pytest tests/test_evaluate.py tests/test_train.py -v` and `python -m pytest`.
+- Report changed files, metrics, run_experiment return shape, prediction schema, test command, test result, and blockers.
 
-Do not implement training runner, benchmark code, or notebooks in MOL-MVP-009.
+Do not implement full benchmark matrix runner, summary scripts, notebooks, or visual analysis in MOL-MVP-010.

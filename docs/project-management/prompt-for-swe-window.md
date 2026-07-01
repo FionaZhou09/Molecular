@@ -25,48 +25,67 @@ GitHub repo：
 - MOL-MVP-006 已完成并通过 review；`src/splits.py` 已有 random/scaffold split。
 - MOL-MVP-007 已完成并通过 review；split diagnostics 和 scaffold count plotting helper 已存在。
 - MOL-MVP-008 已完成并通过 review；`src/models.py` 已有 classical model registry。
+- MOL-MVP-009 已完成并通过 review；`src/models.py` 已有 PyTorch MLP regressor。
 - 当前目录已连接 GitHub，但不要 commit，除非 manager 明确要求。
 
 你的任务：
 
-只执行 **MOL-MVP-009 - Add PyTorch MLP Regressor**。
+只执行 **MOL-MVP-010 - Add Regression Metrics And Single Experiment Runner**。
 
-不要做后续 ticket。不要实现 training runner、benchmark 或 notebooks。
+不要做后续 ticket。不要实现 full benchmark matrix runner、summary scripts、notebooks 或 visual analysis。
 
-MOL-MVP-009 要求：
+MOL-MVP-010 要求：
 
-- Modify `src/models.py`.
-- Extend `tests/test_models.py`.
-- Implement `MLPRegressorTorch`.
-- MLP should support:
-  - hidden layers
-  - dropout
-  - batch size
-  - epochs
-  - learning rate
-  - seed
-  - early stopping
-- MLP must expose the same interface as classical models:
-  - `fit(X_train, y_train)`
-  - `predict(X_test)`
-- Add `mlp` to `create_model(model_key, feature_type, seed, **kwargs)`.
-- Keep CPU training working on small datasets.
-- Add deterministic seed handling for Python/numpy/torch where relevant.
-- Add smoke test that MLP trains on a tiny synthetic regression dataset.
-- Add test that prediction shape is `(n_samples,)`.
-- Add test or assertion that training reduces loss or reaches a lower final loss than initial loss on the tiny synthetic dataset.
-- Preserve existing classical model behavior and scaling rules.
-- Do not implement experiment runner yet. That belongs to MOL-MVP-010.
+- Create `src/evaluate.py`.
+- Create `src/train.py`.
+- Create tests:
+  - `tests/test_evaluate.py`
+  - `tests/test_train.py`
+- Implement RMSE, MAE, and R2 metrics.
+- Implement `evaluate_regression(y_true, y_pred) -> dict`.
+- Metrics must match scikit-learn definitions.
+- Implement `run_experiment(dataset_key, feature_type, model_key, split_type, seed)`.
+- `run_experiment` should:
+  - load processed data from `data/processed/<dataset>.csv`
+  - create random or scaffold split
+  - build features using existing `build_feature_matrix`
+  - train model using existing `create_model`
+  - evaluate validation and test predictions
+  - return a flat result dictionary
+  - also return or expose a prediction table for validation/test rows
+- Result dictionary must include at least:
+  - `dataset`
+  - `feature_type`
+  - `model_key`
+  - `split_type`
+  - `seed`
+  - validation metrics
+  - test metrics
+  - split sizes
+- Prediction table must include at least:
+  - `dataset`
+  - `feature_type`
+  - `model_key`
+  - `split_type`
+  - `seed`
+  - `split`
+  - `smiles`
+  - `target`
+  - `prediction`
+  - `residual`
+  - `scaffold`
+- At least one ESOL Ridge descriptor experiment should run end-to-end.
+- Keep this ticket focused on a single experiment runner. Full grid benchmark belongs to MOL-MVP-011.
 
 执行流程：
 
 1. 检查当前 repo 状态和已有文件。
-2. 阅读 `src/models.py` 和 `tests/test_models.py`，沿用 existing registry style。
-3. 实现 MOL-MVP-009。
+2. 阅读 `src/data_loader.py`、`src/featurize.py`、`src/splits.py`、`src/models.py`，沿用 existing APIs。
+3. 实现 MOL-MVP-010。
 4. 运行：
 
 ```bash
-python -m pytest tests/test_models.py -v
+python -m pytest tests/test_evaluate.py tests/test_train.py -v
 ```
 
 5. 运行完整测试：
@@ -80,20 +99,19 @@ python -m pytest
 完成后请汇报：
 
 - 你创建或修改了哪些文件。
-- `MLPRegressorTorch` 的主要参数和 fit/predict interface。
-- seed 和 early stopping 如何处理。
+- metrics 和 `run_experiment` 返回结构。
+- prediction table schema。
 - 运行了什么测试命令。
 - 测试结果是什么。
 - 是否有 blocker。
-- 下一步建议是否进入 MOL-MVP-010。
+- 下一步建议是否进入 MOL-MVP-011。
 
 验收标准：
 
-- `pytest tests/test_models.py -v` passes。
+- `pytest tests/test_evaluate.py tests/test_train.py -v` passes。
 - `python -m pytest` passes。
-- Registry supports `mlp` in addition to classical models。
-- MLP exposes `fit` and `predict`。
-- MLP prediction shape is `(n_samples,)`。
-- CPU smoke training works on a tiny dataset。
-- Existing classical model tests continue to pass。
-- 没有实现超出 MOL-MVP-009 范围的业务代码。
+- RMSE、MAE、R2 match scikit-learn definitions。
+- One ESOL Ridge descriptor experiment runs end-to-end。
+- Result dict can be appended directly to a pandas DataFrame。
+- Prediction table includes validation/test rows and required traceability fields。
+- 没有实现超出 MOL-MVP-010 范围的业务代码。

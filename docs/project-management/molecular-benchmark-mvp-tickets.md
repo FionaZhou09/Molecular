@@ -177,7 +177,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-009 - Add PyTorch MLP Regressor
 
-- **Status note:** Ready to start. MOL-MVP-008 is complete.
+- **Status:** Complete. PyTorch MLP regressor, registry integration, CPU smoke training, seed handling, and tests were accepted by review.
 - **Background:** PRD requires at least one neural network model in the MVP benchmark.
 - **Owner role:** SWE
 - **Reviewer role:** ML Engineer
@@ -192,6 +192,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-010 - Add Regression Metrics And Single Experiment Runner
 
+- **Status note:** Ready to start. MOL-MVP-009 is complete.
 - **Background:** Every experiment needs one traceable result row.
 - **Owner role:** SWE
 - **Reviewer role:** ML Reviewer
