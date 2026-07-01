@@ -11,7 +11,7 @@ Read these files before starting:
 2. `/Users/yingzhou/Documents/Molecular/docs/superpowers/plans/2026-07-01-molecular-property-prediction-benchmark.md`
 3. `/Users/yingzhou/Documents/Molecular/docs/project-management/molecular-benchmark-mvp-tickets.md`
 
-MOL-MVP-001 is considered complete. Start with **MOL-MVP-002A** only unless the manager explicitly assigns a different ticket.
+MOL-MVP-001 and MOL-MVP-002A are considered complete. Start with **MOL-MVP-002** only unless the manager explicitly assigns a different ticket.
 
 Execution rules:
 - Implement one ticket at a time.
@@ -49,12 +49,14 @@ MVP order:
 14. MOL-MVP-013 - Add chemical space split visualization
 15. MOL-MVP-014 - Write README and reproducibility pass
 
-For MOL-MVP-002A, do this:
-- Acquire ESOL/Delaney and FreeSolv raw CSVs from a documented source.
-- Save them as `data/raw/esol.csv` and `data/raw/freesolv.csv`.
-- Preserve original source columns; do not normalize to `smiles,target` yet.
-- Add `data/raw/README.md` with source URL or package source, retrieval date, row count, observed SMILES column, observed target column, and any filename-only normalization.
-- Verify both CSV files are readable and non-empty.
-- Report source, row counts, validation command, validation result, and blockers.
+For MOL-MVP-002, do this:
+- Create `src/config.py` and `src/data_loader.py`.
+- Create `tests/test_config.py` and `tests/test_data_loader.py`.
+- Register `esol` and `freesolv` metadata with raw path, processed path, source note, expected row count, SMILES column, target column, and `task_type="regression"`.
+- Use actual raw columns from `data/raw/README.md`: ESOL `smiles` / `measured log solubility in mols per litre`; FreeSolv `smiles` / `y`.
+- Implement `load_raw_dataset(dataset_key: str) -> pandas.DataFrame`.
+- Implement `normalize_dataset(df, smiles_col, target_col) -> pandas.DataFrame`, returning exactly `smiles,target` and dropping missing SMILES or target rows.
+- Run `python -m pytest tests/test_config.py tests/test_data_loader.py -v`.
+- Report changed files, metadata keys and columns, test command, test result, and blockers.
 
-Do not implement data loading, SMILES validation, featurization, models, or benchmark code in MOL-MVP-002A.
+Do not implement SMILES validation, featurization, models, or benchmark code in MOL-MVP-002.

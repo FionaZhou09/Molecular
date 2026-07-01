@@ -57,13 +57,13 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-002 - Add Dataset Configuration And Raw Loading
 
-- **Status note:** Do not start until MOL-MVP-002A has resolved raw CSV availability.
+- **Status note:** Ready to start. MOL-MVP-002A resolved raw CSV availability.
 - **Background:** MVP supports ESOL and FreeSolv, normalized to `{smiles, target}`.
 - **Owner role:** SWE
 - **Reviewer role:** ML Engineer
 - **Input files:** PRD sections 4 and 5.1; implementation plan Phase 1.1 and 1.2; raw CSV files from MOL-MVP-002A
 - **Output files:** `src/config.py`, `src/data_loader.py`, `tests/test_config.py`, `tests/test_data_loader.py`
-- **Implementation requirements:** Register `esol` and `freesolv` metadata with raw path, processed path, source URL or source note, expected row count, SMILES column, target column, and `task_type="regression"`. Implement `load_raw_dataset(dataset_key)` and `normalize_dataset(df, smiles_col, target_col)`. Normalized data must contain exactly `smiles,target`. Drop rows with missing SMILES or target.
+- **Implementation requirements:** Register `esol` and `freesolv` metadata with raw path, processed path, source URL or source note, expected row count, SMILES column, target column, and `task_type="regression"`. Use actual raw columns documented in `data/raw/README.md`: ESOL SMILES column `smiles`, ESOL target column `measured log solubility in mols per litre`; FreeSolv SMILES column `smiles`, FreeSolv target column `y`. Implement `load_raw_dataset(dataset_key)` and `normalize_dataset(df, smiles_col, target_col)`. Normalized data must contain exactly `smiles,target`. Drop rows with missing SMILES or target.
 - **Testing requirements:** Test both dataset keys exist and are regression tasks. Use in-memory DataFrames to test missing-row dropping and column normalization.
 - **Acceptance criteria:** `pytest tests/test_config.py tests/test_data_loader.py -v` passes. Normalized output columns are exactly `smiles,target`. Dataset metadata points to existing raw CSV paths created by MOL-MVP-002A.
 - **Estimate:** S
@@ -72,12 +72,13 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-002A - Acquire ESOL And FreeSolv Raw CSVs
 
+- **Status:** Complete. Raw CSVs were acquired from DeepChem MoleculeNet sources, verified readable, and documented in `data/raw/README.md`.
 - **Background:** Later data loading tickets assume raw CSVs exist. This ticket makes dataset availability explicit before implementing loaders.
 - **Owner role:** SWE
 - **Reviewer role:** ML Engineer
 - **Input files:** PRD section 4.3; official MoleculeNet or DeepChem dataset references
 - **Output files:** `data/raw/esol.csv`, `data/raw/freesolv.csv`, optionally `data/raw/README.md`
-- **Implementation requirements:** Acquire ESOL/Delaney and FreeSolv raw CSVs from a documented source. Preferred source is MoleculeNet official data; acceptable fallback is DeepChem's MoleculeNet loader or another clearly documented mirror if official download is unavailable. Preserve or document original source column names. Expected source columns are typically ESOL `smiles` plus `measured log solubility in mols per litre`, and FreeSolv `mol` plus `y`. Record source URL, retrieval date, and any filename normalization in `data/raw/README.md`.
+- **Implementation requirements:** Acquire ESOL/Delaney and FreeSolv raw CSVs from a documented source. Preferred source is MoleculeNet official data; acceptable fallback is DeepChem's MoleculeNet loader or another clearly documented mirror if official download is unavailable. Preserve or document original source column names. Expected source columns are ESOL `smiles` plus `measured log solubility in mols per litre`, and FreeSolv `smiles` plus `y` for the acquired DeepChem CSV. Record source URL, retrieval date, and any filename normalization in `data/raw/README.md`.
 - **Testing requirements:** Verify both CSV files exist, are readable by pandas, have nonzero rows, and contain expected SMILES/target source columns. Do not run RDKit validation in this ticket.
 - **Acceptance criteria:** `data/raw/esol.csv` and `data/raw/freesolv.csv` exist. Source provenance is documented. Row counts are reported and roughly match expected MoleculeNet sizes: ESOL about 1128 rows, FreeSolv about 642 rows.
 - **Estimate:** S
