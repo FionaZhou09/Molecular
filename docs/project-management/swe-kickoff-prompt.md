@@ -11,7 +11,7 @@ Read these files before starting:
 2. `/Users/yingzhou/Documents/Molecular/docs/superpowers/plans/2026-07-01-molecular-property-prediction-benchmark.md`
 3. `/Users/yingzhou/Documents/Molecular/docs/project-management/molecular-benchmark-mvp-tickets.md`
 
-MOL-MVP-001 through MOL-MVP-009 are considered complete. Start with **MOL-MVP-010** only unless the manager explicitly assigns a different ticket.
+MOL-MVP-001 through MOL-MVP-010 are considered complete. Start with **MOL-MVP-011** only unless the manager explicitly assigns a different ticket.
 
 Execution rules:
 - Implement one ticket at a time.
@@ -49,18 +49,18 @@ MVP order:
 14. MOL-MVP-013 - Add chemical space split visualization
 15. MOL-MVP-014 - Write README and reproducibility pass
 
-For MOL-MVP-010, do this:
-- Create `src/evaluate.py` and `src/train.py`.
-- Create `tests/test_evaluate.py` and `tests/test_train.py`.
-- Implement RMSE, MAE, and R2 metrics matching scikit-learn definitions.
-- Implement `evaluate_regression(y_true, y_pred) -> dict`.
-- Implement `run_experiment(dataset_key, feature_type, model_key, split_type, seed)`.
-- `run_experiment` should load processed data, create split, build features, train model, evaluate validation/test, return a flat result dictionary, and return or expose validation/test prediction rows.
-- Result dict must trace `dataset`, `feature_type`, `model_key`, `split_type`, `seed`, metrics, and split sizes.
-- Prediction rows must include `dataset`, `feature_type`, `model_key`, `split_type`, `seed`, `split`, `smiles`, `target`, `prediction`, `residual`, and `scaffold`.
-- Add tests with known metric values.
-- Add an end-to-end smoke test for one ESOL Ridge descriptor experiment.
-- Run `python -m pytest tests/test_evaluate.py tests/test_train.py -v` and `python -m pytest`.
-- Report changed files, metrics, run_experiment return shape, prediction schema, test command, test result, and blockers.
+For MOL-MVP-011, do this:
+- Modify `src/train.py` if needed.
+- Create `scripts/run_benchmark.py` and `scripts/summarize_results.py`.
+- Add or extend tests, preferably `tests/test_train.py`.
+- Full benchmark matrix should support datasets `esol,freesolv`, feature types `descriptors,fingerprints,combined`, models `ridge,lasso,random_forest,xgboost,mlp`, split types `random,scaffold`, and seeds `0,1,2,3,4`.
+- Write `results/benchmark_results.csv`, `results/predictions.csv`, and `results/benchmark_summary.csv`.
+- `benchmark_results.csv` should have one row per dataset-feature-model-split-seed combination.
+- `predictions.csv` should append validation/test prediction rows from `run_experiment`.
+- `benchmark_summary.csv` should group by dataset, feature type, model, and split type, with mean and std for RMSE, MAE, and R2 across seeds.
+- Failed experiments must be surfaced clearly, not silently skipped.
+- Add a smoke mode / dry-run option so tests do not run the full expensive benchmark.
+- Run `python -m pytest tests/test_train.py -v` and `python -m pytest`.
+- Report changed files, benchmark matrix, output schemas, smoke/dry-run command, test command, test result, and blockers.
 
-Do not implement full benchmark matrix runner, summary scripts, notebooks, or visual analysis in MOL-MVP-010.
+Do not implement notebooks, prediction plots, chemical space visualization, or README polish in MOL-MVP-011.

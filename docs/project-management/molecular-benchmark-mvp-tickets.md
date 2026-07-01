@@ -192,7 +192,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-010 - Add Regression Metrics And Single Experiment Runner
 
-- **Status note:** Ready to start. MOL-MVP-009 is complete.
+- **Status:** Complete. Regression metrics, single experiment runner, traceable result rows, prediction rows, and end-to-end smoke tests were accepted by review.
 - **Background:** Every experiment needs one traceable result row.
 - **Owner role:** SWE
 - **Reviewer role:** ML Reviewer
@@ -207,6 +207,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-011 - Add Benchmark Matrix Runner And Summary
 
+- **Status note:** Ready to start. MOL-MVP-010 is complete.
 - **Background:** Produce the main benchmark table for random vs scaffold comparison.
 - **Owner role:** SWE
 - **Reviewer role:** ML Reviewer
