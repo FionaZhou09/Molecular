@@ -1,8 +1,16 @@
 import numpy as np
 import pandas as pd
 import pytest
+import matplotlib.pyplot as plt
 
-from src.splits import compute_scaffold, random_split, scaffold_split
+from src.splits import (
+    compute_scaffold,
+    scaffold_overlap_summary,
+    scaffold_split,
+    split_size_summary,
+    random_split,
+)
+from src.visualize import plot_scaffold_counts
 
 
 def _assert_complete_non_overlapping_split(split_indices, expected_indices):
@@ -125,3 +133,115 @@ def test_scaffold_split_is_deterministic_for_same_seed():
 
     for first_split, second_split in zip(first, second):
         np.testing.assert_array_equal(first_split, second_split)
+
+
+def test_split_size_summary_reports_train_validation_and_test_sizes():
+    df = pd.DataFrame({"smiles": ["CCO", "CCN", "CCC", "CCCl"]})
+    split_indices = (
+        np.array([0, 1]),
+        np.array([2]),
+        np.array([3]),
+    )
+
+    summary = split_size_summary(df, *split_indices)
+
+    assert isinstance(summary, pd.DataFrame)
+    assert list(summary.columns) == ["split", "n_rows", "fraction"]
+    assert summary.to_dict("records") == [
+        {"split": "train", "n_rows": 2, "fraction": 0.5},
+        {"split": "validation", "n_rows": 1, "fraction": 0.25},
+        {"split": "test", "n_rows": 1, "fraction": 0.25},
+    ]
+
+
+def test_scaffold_overlap_summary_reports_zero_overlap_for_scaffold_split():
+    df = pd.DataFrame(
+        {
+            "smiles": [
+                "c1ccccc1",
+                "Cc1ccccc1",
+                "Oc1ccccc1",
+                "C1CCCCC1",
+                "CC1CCCCC1",
+                "C1CCNCC1",
+                "CCO",
+                "CCN",
+                "CCCl",
+                "CCCBr",
+            ]
+        }
+    )
+    train_idx, val_idx, test_idx = scaffold_split(
+        df,
+        train_size=0.6,
+        val_size=0.2,
+        test_size=0.2,
+        seed=7,
+    )
+
+    overlap = scaffold_overlap_summary(df, train_idx, val_idx, test_idx)
+
+    assert isinstance(overlap, pd.DataFrame)
+    assert list(overlap.columns) == [
+        "split_a",
+        "split_b",
+        "n_overlapping_scaffolds",
+        "overlapping_scaffolds",
+    ]
+    assert set(overlap["n_overlapping_scaffolds"]) == {0}
+    assert overlap["overlapping_scaffolds"].tolist() == [(), (), ()]
+
+
+def test_scaffold_overlap_summary_reports_leakage_for_random_like_split():
+    df = pd.DataFrame(
+        {
+            "smiles": [
+                "c1ccccc1",
+                "Cc1ccccc1",
+                "C1CCCCC1",
+                "CCO",
+            ]
+        }
+    )
+
+    overlap = scaffold_overlap_summary(
+        df,
+        train_idx=np.array([0, 2]),
+        val_idx=np.array([1]),
+        test_idx=np.array([3]),
+    )
+
+    train_val = overlap[
+        (overlap["split_a"] == "train") & (overlap["split_b"] == "validation")
+    ].iloc[0]
+    assert train_val["n_overlapping_scaffolds"] == 1
+    assert train_val["overlapping_scaffolds"] == ("c1ccccc1",)
+
+
+def test_plot_scaffold_counts_returns_axes_with_split_bars():
+    df = pd.DataFrame(
+        {
+            "smiles": [
+                "c1ccccc1",
+                "Cc1ccccc1",
+                "C1CCCCC1",
+                "CCO",
+            ]
+        }
+    )
+
+    ax = plot_scaffold_counts(
+        df,
+        train_idx=np.array([0, 1]),
+        val_idx=np.array([2]),
+        test_idx=np.array([3]),
+    )
+
+    assert ax.get_ylabel() == "Unique scaffolds"
+    assert [tick.get_text() for tick in ax.get_xticklabels()] == [
+        "train",
+        "validation",
+        "test",
+    ]
+    assert len(ax.patches) == 3
+    plt.close(ax.figure)

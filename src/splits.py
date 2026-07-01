@@ -99,3 +99,84 @@ def scaffold_split(
         np.asarray(val_indices, dtype=np.asarray(df.index).dtype),
         np.asarray(test_indices, dtype=np.asarray(df.index).dtype),
     )
+
+
+def split_size_summary(
+    df: pd.DataFrame,
+    train_idx,
+    val_idx,
+    test_idx,
+) -> pd.DataFrame:
+    total_rows = len(df)
+    rows = []
+    for split_name, indices in (
+        ("train", train_idx),
+        ("validation", val_idx),
+        ("test", test_idx),
+    ):
+        n_rows = len(indices)
+        fraction = n_rows / total_rows if total_rows else 0.0
+        rows.append(
+            {
+                "split": split_name,
+                "n_rows": n_rows,
+                "fraction": fraction,
+            }
+        )
+    return pd.DataFrame(rows, columns=["split", "n_rows", "fraction"])
+
+
+def scaffold_sets_by_split(
+    df: pd.DataFrame,
+    train_idx,
+    val_idx,
+    test_idx,
+) -> dict[str, set[str]]:
+    scaffold_sets = {}
+    for split_name, indices in (
+        ("train", train_idx),
+        ("validation", val_idx),
+        ("test", test_idx),
+    ):
+        scaffold_sets[split_name] = {
+            compute_scaffold(df.loc[index, "smiles"]) for index in indices
+        }
+    return scaffold_sets
+
+
+def scaffold_overlap_summary(
+    df: pd.DataFrame,
+    train_idx,
+    val_idx,
+    test_idx,
+) -> pd.DataFrame:
+    scaffold_sets = scaffold_sets_by_split(df, train_idx, val_idx, test_idx)
+    rows = []
+    split_pairs = (
+        ("train", "validation"),
+        ("train", "test"),
+        ("validation", "test"),
+    )
+
+    for split_a, split_b in split_pairs:
+        overlapping_scaffolds = tuple(
+            sorted(scaffold_sets[split_a] & scaffold_sets[split_b])
+        )
+        rows.append(
+            {
+                "split_a": split_a,
+                "split_b": split_b,
+                "n_overlapping_scaffolds": len(overlapping_scaffolds),
+                "overlapping_scaffolds": overlapping_scaffolds,
+            }
+        )
+
+    return pd.DataFrame(
+        rows,
+        columns=[
+            "split_a",
+            "split_b",
+            "n_overlapping_scaffolds",
+            "overlapping_scaffolds",
+        ],
+    )

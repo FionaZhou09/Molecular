@@ -11,7 +11,7 @@ Read these files before starting:
 2. `/Users/yingzhou/Documents/Molecular/docs/superpowers/plans/2026-07-01-molecular-property-prediction-benchmark.md`
 3. `/Users/yingzhou/Documents/Molecular/docs/project-management/molecular-benchmark-mvp-tickets.md`
 
-MOL-MVP-001, MOL-MVP-002A, MOL-MVP-002, MOL-MVP-003, MOL-MVP-004, MOL-MVP-005, and MOL-MVP-006 are considered complete. Start with **MOL-MVP-007** only unless the manager explicitly assigns a different ticket.
+MOL-MVP-001 through MOL-MVP-007 are considered complete. Start with **MOL-MVP-008** only unless the manager explicitly assigns a different ticket.
 
 Execution rules:
 - Implement one ticket at a time.
@@ -49,15 +49,18 @@ MVP order:
 14. MOL-MVP-013 - Add chemical space split visualization
 15. MOL-MVP-014 - Write README and reproducibility pass
 
-For MOL-MVP-007, do this:
-- Modify `src/splits.py`.
-- Create `src/visualize.py`.
-- Extend `tests/test_splits.py`.
-- Implement split size summaries for train/validation/test.
-- Implement scaffold overlap diagnostics that show zero overlap for scaffold split.
-- Diagnostics should return DataFrame or dictionary outputs that can be exported later.
-- Add a matplotlib-based plotting helper for train/validation/test scaffold counts in `src/visualize.py`.
-- Run `python -m pytest tests/test_splits.py -v` and `python -m pytest`.
-- Report changed files, diagnostics return structure, zero-leakage representation, visualization helper, test command, test result, and blockers.
+For MOL-MVP-008, do this:
+- Create `src/models.py`.
+- Create `tests/test_models.py`.
+- Implement `create_model(model_key, feature_type, seed, **kwargs)` for `ridge`, `lasso`, `random_forest`, and `xgboost`.
+- All returned models must expose scikit-learn-compatible `fit` and `predict`.
+- For `feature_type` values `descriptors` and `combined`, wrap the estimator in a `Pipeline` with `StandardScaler` followed by the model.
+- For `feature_type="fingerprints"`, do not include `StandardScaler`.
+- Pass `seed` / `random_state` to models where applicable.
+- Add tests that each model fits and predicts on a tiny synthetic regression dataset.
+- Add tests for prediction shape `(n_samples,)`.
+- Add tests for scaler behavior by feature type.
+- Run `python -m pytest tests/test_models.py -v` and `python -m pytest`.
+- Report changed files, registry keys, scaler rules, test command, test result, and blockers.
 
-Do not implement models, training, benchmark code, or notebooks in MOL-MVP-007.
+Do not implement PyTorch MLP, training runner, benchmark code, or notebooks in MOL-MVP-008.

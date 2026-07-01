@@ -147,7 +147,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-007 - Add Split Diagnostics And Visualization Helpers
 
-- **Status note:** Ready to start. MOL-MVP-006 is complete.
+- **Status:** Complete. Split size summaries, scaffold overlap diagnostics, scaffold count plotting helper, and tests were accepted by review.
 - **Background:** Scaffold split correctness must be auditable, not just asserted.
 - **Owner role:** SWE
 - **Reviewer role:** ML Reviewer
@@ -162,6 +162,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-008 - Add Classical Model Registry
 
+- **Status note:** Ready to start. MOL-MVP-007 is complete.
 - **Background:** A unified model interface enables batch benchmark execution.
 - **Owner role:** SWE
 - **Reviewer role:** ML Engineer
