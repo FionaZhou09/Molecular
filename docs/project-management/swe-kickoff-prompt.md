@@ -11,7 +11,7 @@ Read these files before starting:
 2. `/Users/yingzhou/Documents/Molecular/docs/superpowers/plans/2026-07-01-molecular-property-prediction-benchmark.md`
 3. `/Users/yingzhou/Documents/Molecular/docs/project-management/molecular-benchmark-mvp-tickets.md`
 
-MOL-MVP-001, MOL-MVP-002A, MOL-MVP-002, and MOL-MVP-003 are considered complete. Start with **MOL-MVP-004** only unless the manager explicitly assigns a different ticket.
+MOL-MVP-001, MOL-MVP-002A, MOL-MVP-002, MOL-MVP-003, and MOL-MVP-004 are considered complete. Start with **MOL-MVP-005** only unless the manager explicitly assigns a different ticket.
 
 Execution rules:
 - Implement one ticket at a time.
@@ -49,16 +49,18 @@ MVP order:
 14. MOL-MVP-013 - Add chemical space split visualization
 15. MOL-MVP-014 - Write README and reproducibility pass
 
-For MOL-MVP-004, do this:
-- Create `src/featurize.py`.
-- Create `tests/test_featurize.py`.
-- Implement `compute_descriptors(smiles_list) -> pandas.DataFrame` with 20-30 stable RDKit descriptors covering molecular weight, LogP, TPSA, HBD, HBA, rotatable bonds, ring counts, aromatic rings, formal charge, FractionCSP3, and molar refractivity.
-- Invalid SMILES must fail explicitly, not be silently featurized.
-- Implement `compute_morgan_fingerprints(smiles_list, radius=2, n_bits=2048) -> numpy.ndarray`.
-- Support `n_bits=512`, `1024`, and `2048`.
-- Add tests for descriptor numeric finite values on `CCO`, `c1ccccc1`, and `CC(=O)O`.
-- Add tests for fingerprint shape and binary values.
+For MOL-MVP-005, do this:
+- Modify `src/featurize.py`.
+- Extend `tests/test_featurize.py`.
+- Implement `build_feature_matrix(df, feature_type)` with feature types `descriptors`, `fingerprints`, and `combined`.
+- Input `df` should contain at least a `smiles` column.
+- Return `(X, feature_names)`.
+- `descriptors` should return descriptor features and descriptor names.
+- `fingerprints` should return Morgan fingerprint features and bit names like `morgan_0`, `morgan_1`, ...
+- `combined` should concatenate descriptors and fingerprints in stable order.
+- Do not import, fit, or apply `StandardScaler` in `build_feature_matrix`; scaling is train-only and belongs to later model/train workflows.
+- Add tests for all three modes, feature name lengths, combined dimensions, and unsupported feature type errors.
 - Run `python -m pytest tests/test_featurize.py -v` and `python -m pytest`.
-- Report changed files, descriptor columns, fingerprint options, test command, test result, and blockers.
+- Report changed files, supported feature types, return structure, no-scaling check, test command, test result, and blockers.
 
-Do not implement feature matrix builder, splits, models, or benchmark code in MOL-MVP-004.
+Do not implement splits, models, or benchmark code in MOL-MVP-005.

@@ -102,7 +102,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-004 - Implement RDKit Descriptors And Morgan Fingerprints
 
-- **Status note:** Ready to start. MOL-MVP-003 is complete.
+- **Status:** Complete. RDKit descriptors, Morgan fingerprints, invalid SMILES handling, and tests were accepted by review.
 - **Background:** Implement the two core MVP molecular representations.
 - **Owner role:** SWE
 - **Reviewer role:** ML Engineer
@@ -117,6 +117,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-005 - Add Feature Matrix Builder With No Global Scaling
 
+- **Status note:** Ready to start. MOL-MVP-004 is complete.
 - **Background:** Provide a single feature entrypoint while preventing descriptor scaling leakage.
 - **Owner role:** SWE
 - **Reviewer role:** ML Engineer
