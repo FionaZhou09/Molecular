@@ -87,7 +87,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-003 - Add SMILES Validation And Preprocessing Script
 
-- **Status note:** Ready to start. MOL-MVP-002 is complete.
+- **Status:** Complete. SMILES validation, preprocessing script, processed CSV outputs, and tests were accepted by review.
 - **Background:** Invalid molecules must be removed from processed data and remain inspectable.
 - **Owner role:** SWE
 - **Reviewer role:** ML Engineer
@@ -102,6 +102,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-004 - Implement RDKit Descriptors And Morgan Fingerprints
 
+- **Status note:** Ready to start. MOL-MVP-003 is complete.
 - **Background:** Implement the two core MVP molecular representations.
 - **Owner role:** SWE
 - **Reviewer role:** ML Engineer

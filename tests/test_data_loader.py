@@ -1,7 +1,13 @@
 import pandas as pd
 import pytest
 
-from src.data_loader import load_raw_dataset, normalize_dataset
+from src.config import DATASETS, DatasetConfig
+from src.data_loader import (
+    load_raw_dataset,
+    normalize_dataset,
+    save_processed_dataset,
+    validate_smiles,
+)
 
 
 def test_load_raw_dataset_reads_esol_and_freesolv():
@@ -56,3 +62,53 @@ def test_normalize_dataset_drops_missing_smiles_or_target_deterministically():
         {"smiles": "CCC", "target": 4.0},
     ]
     assert list(normalized.index) == [0, 1]
+
+
+def test_validate_smiles_returns_valid_and_invalid_rows_separately():
+    normalized = pd.DataFrame(
+        {
+            "smiles": ["CCO", "not_a_smiles", "c1ccccc1"],
+            "target": [1.0, 2.0, 3.0],
+        }
+    )
+
+    valid_rows, invalid_rows = validate_smiles(normalized)
+
+    assert valid_rows.to_dict("records") == [
+        {"smiles": "CCO", "target": 1.0},
+        {"smiles": "c1ccccc1", "target": 3.0},
+    ]
+    assert invalid_rows.to_dict("records") == [
+        {"smiles": "not_a_smiles", "target": 2.0},
+    ]
+
+
+def test_save_processed_dataset_writes_only_smiles_and_target(tmp_path, monkeypatch):
+    processed_path = tmp_path / "processed" / "tiny.csv"
+    monkeypatch.setitem(
+        DATASETS,
+        "tiny",
+        DatasetConfig(
+            display_name="Tiny",
+            raw_path=tmp_path / "raw.csv",
+            processed_path=processed_path,
+            source="test fixture",
+            expected_row_count=1,
+            smiles_column="smiles",
+            target_column="y",
+            task_type="regression",
+        ),
+    )
+    df = pd.DataFrame(
+        {
+            "smiles": ["CCO"],
+            "target": [1.0],
+            "extra": ["do not save"],
+        }
+    )
+
+    save_processed_dataset("tiny", df)
+
+    saved = pd.read_csv(processed_path)
+    assert list(saved.columns) == ["smiles", "target"]
+    assert saved.to_dict("records") == [{"smiles": "CCO", "target": 1.0}]

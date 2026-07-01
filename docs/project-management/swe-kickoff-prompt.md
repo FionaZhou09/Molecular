@@ -11,7 +11,7 @@ Read these files before starting:
 2. `/Users/yingzhou/Documents/Molecular/docs/superpowers/plans/2026-07-01-molecular-property-prediction-benchmark.md`
 3. `/Users/yingzhou/Documents/Molecular/docs/project-management/molecular-benchmark-mvp-tickets.md`
 
-MOL-MVP-001, MOL-MVP-002A, and MOL-MVP-002 are considered complete. Start with **MOL-MVP-003** only unless the manager explicitly assigns a different ticket.
+MOL-MVP-001, MOL-MVP-002A, MOL-MVP-002, and MOL-MVP-003 are considered complete. Start with **MOL-MVP-004** only unless the manager explicitly assigns a different ticket.
 
 Execution rules:
 - Implement one ticket at a time.
@@ -49,19 +49,16 @@ MVP order:
 14. MOL-MVP-013 - Add chemical space split visualization
 15. MOL-MVP-014 - Write README and reproducibility pass
 
-For MOL-MVP-003, do this:
-- Modify `src/data_loader.py`.
-- Create `scripts/preprocess_data.py`.
-- Extend `tests/test_data_loader.py`.
-- Implement `validate_smiles(df) -> tuple[pandas.DataFrame, pandas.DataFrame]` using RDKit `Chem.MolFromSmiles`.
-- Return valid rows and invalid rows separately; invalid molecules must not enter processed data.
-- Implement `save_processed_dataset(dataset_key, df)`.
-- Add a CLI accepting `--dataset esol` and `--dataset freesolv`.
-- The CLI should load raw data, normalize to `smiles,target`, validate SMILES, and save valid rows to `data/processed/<dataset>.csv`.
-- Processed CSV must contain only `smiles,target`.
-- Add tests for valid `CCO` and invalid `not_a_smiles`.
-- Run `python -m pytest tests/test_data_loader.py -v` and `python -m pytest`.
-- Optionally smoke test `python scripts/preprocess_data.py --dataset esol`.
-- Report changed files, validation behavior, test command, test result, CLI smoke test result, and blockers.
+For MOL-MVP-004, do this:
+- Create `src/featurize.py`.
+- Create `tests/test_featurize.py`.
+- Implement `compute_descriptors(smiles_list) -> pandas.DataFrame` with 20-30 stable RDKit descriptors covering molecular weight, LogP, TPSA, HBD, HBA, rotatable bonds, ring counts, aromatic rings, formal charge, FractionCSP3, and molar refractivity.
+- Invalid SMILES must fail explicitly, not be silently featurized.
+- Implement `compute_morgan_fingerprints(smiles_list, radius=2, n_bits=2048) -> numpy.ndarray`.
+- Support `n_bits=512`, `1024`, and `2048`.
+- Add tests for descriptor numeric finite values on `CCO`, `c1ccccc1`, and `CC(=O)O`.
+- Add tests for fingerprint shape and binary values.
+- Run `python -m pytest tests/test_featurize.py -v` and `python -m pytest`.
+- Report changed files, descriptor columns, fingerprint options, test command, test result, and blockers.
 
-Do not implement featurization, splits, models, or benchmark code in MOL-MVP-003.
+Do not implement feature matrix builder, splits, models, or benchmark code in MOL-MVP-004.
