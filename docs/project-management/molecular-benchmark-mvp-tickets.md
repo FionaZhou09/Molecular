@@ -162,7 +162,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-008 - Add Classical Model Registry
 
-- **Status note:** Ready to start. MOL-MVP-007 is complete.
+- **Status:** Complete. Classical model registry, feature-type scaling rules, fit/predict tests, and seeded model behavior were accepted by review.
 - **Background:** A unified model interface enables batch benchmark execution.
 - **Owner role:** SWE
 - **Reviewer role:** ML Engineer
@@ -177,6 +177,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-009 - Add PyTorch MLP Regressor
 
+- **Status note:** Ready to start. MOL-MVP-008 is complete.
 - **Background:** PRD requires at least one neural network model in the MVP benchmark.
 - **Owner role:** SWE
 - **Reviewer role:** ML Engineer

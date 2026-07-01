@@ -11,7 +11,7 @@ Read these files before starting:
 2. `/Users/yingzhou/Documents/Molecular/docs/superpowers/plans/2026-07-01-molecular-property-prediction-benchmark.md`
 3. `/Users/yingzhou/Documents/Molecular/docs/project-management/molecular-benchmark-mvp-tickets.md`
 
-MOL-MVP-001 through MOL-MVP-007 are considered complete. Start with **MOL-MVP-008** only unless the manager explicitly assigns a different ticket.
+MOL-MVP-001 through MOL-MVP-008 are considered complete. Start with **MOL-MVP-009** only unless the manager explicitly assigns a different ticket.
 
 Execution rules:
 - Implement one ticket at a time.
@@ -49,18 +49,18 @@ MVP order:
 14. MOL-MVP-013 - Add chemical space split visualization
 15. MOL-MVP-014 - Write README and reproducibility pass
 
-For MOL-MVP-008, do this:
-- Create `src/models.py`.
-- Create `tests/test_models.py`.
-- Implement `create_model(model_key, feature_type, seed, **kwargs)` for `ridge`, `lasso`, `random_forest`, and `xgboost`.
-- All returned models must expose scikit-learn-compatible `fit` and `predict`.
-- For `feature_type` values `descriptors` and `combined`, wrap the estimator in a `Pipeline` with `StandardScaler` followed by the model.
-- For `feature_type="fingerprints"`, do not include `StandardScaler`.
-- Pass `seed` / `random_state` to models where applicable.
-- Add tests that each model fits and predicts on a tiny synthetic regression dataset.
-- Add tests for prediction shape `(n_samples,)`.
-- Add tests for scaler behavior by feature type.
+For MOL-MVP-009, do this:
+- Modify `src/models.py`.
+- Extend `tests/test_models.py`.
+- Implement `MLPRegressorTorch` with hidden layers, dropout, batch size, epochs, learning rate, seed, and early stopping.
+- MLP must expose `fit(X_train, y_train)` and `predict(X_test)`.
+- Add `mlp` to `create_model(model_key, feature_type, seed, **kwargs)`.
+- Keep CPU training working on small datasets.
+- Add deterministic seed handling for numpy/torch where relevant.
+- Add smoke tests for MLP fit/predict on a tiny synthetic regression dataset.
+- Add test that prediction shape is `(n_samples,)`.
+- Add test or assertion that training reduces loss or final loss is lower than initial loss on the tiny dataset.
 - Run `python -m pytest tests/test_models.py -v` and `python -m pytest`.
-- Report changed files, registry keys, scaler rules, test command, test result, and blockers.
+- Report changed files, MLP interface, seed/early-stopping behavior, test command, test result, and blockers.
 
-Do not implement PyTorch MLP, training runner, benchmark code, or notebooks in MOL-MVP-008.
+Do not implement training runner, benchmark code, or notebooks in MOL-MVP-009.
