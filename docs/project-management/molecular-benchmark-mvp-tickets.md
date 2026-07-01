@@ -132,7 +132,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-006 - Implement Random And Scaffold Splits
 
-- **Status note:** Ready to start. MOL-MVP-005 is complete.
+- **Status:** Complete. Random split, Bemis-Murcko scaffold split, deterministic behavior, and non-leakage tests were accepted by review.
 - **Background:** Random split vs scaffold split is the project's central methodological comparison.
 - **Owner role:** SWE
 - **Reviewer role:** ML Reviewer
@@ -147,6 +147,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-007 - Add Split Diagnostics And Visualization Helpers
 
+- **Status note:** Ready to start. MOL-MVP-006 is complete.
 - **Background:** Scaffold split correctness must be auditable, not just asserted.
 - **Owner role:** SWE
 - **Reviewer role:** ML Reviewer

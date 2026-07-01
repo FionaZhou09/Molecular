@@ -11,7 +11,7 @@ Read these files before starting:
 2. `/Users/yingzhou/Documents/Molecular/docs/superpowers/plans/2026-07-01-molecular-property-prediction-benchmark.md`
 3. `/Users/yingzhou/Documents/Molecular/docs/project-management/molecular-benchmark-mvp-tickets.md`
 
-MOL-MVP-001, MOL-MVP-002A, MOL-MVP-002, MOL-MVP-003, MOL-MVP-004, and MOL-MVP-005 are considered complete. Start with **MOL-MVP-006** only unless the manager explicitly assigns a different ticket.
+MOL-MVP-001, MOL-MVP-002A, MOL-MVP-002, MOL-MVP-003, MOL-MVP-004, MOL-MVP-005, and MOL-MVP-006 are considered complete. Start with **MOL-MVP-007** only unless the manager explicitly assigns a different ticket.
 
 Execution rules:
 - Implement one ticket at a time.
@@ -49,16 +49,15 @@ MVP order:
 14. MOL-MVP-013 - Add chemical space split visualization
 15. MOL-MVP-014 - Write README and reproducibility pass
 
-For MOL-MVP-006, do this:
-- Create `src/splits.py`.
-- Create `tests/test_splits.py`.
-- Implement `random_split(df, train_size=0.8, val_size=0.1, test_size=0.1, seed=42)`, returning train/validation/test index arrays.
-- Random split must be deterministic for the same seed, non-overlapping, and cover all rows exactly once.
-- Implement `compute_scaffold(smiles) -> str` using RDKit Bemis-Murcko scaffolds.
-- Implement `scaffold_split(df, train_size=0.8, val_size=0.1, test_size=0.1, seed=42)`, returning train/validation/test index arrays.
-- Scaffold split must ensure the same scaffold never crosses train/validation/test.
-- Add tests with duplicated scaffolds.
+For MOL-MVP-007, do this:
+- Modify `src/splits.py`.
+- Create `src/visualize.py`.
+- Extend `tests/test_splits.py`.
+- Implement split size summaries for train/validation/test.
+- Implement scaffold overlap diagnostics that show zero overlap for scaffold split.
+- Diagnostics should return DataFrame or dictionary outputs that can be exported later.
+- Add a matplotlib-based plotting helper for train/validation/test scaffold counts in `src/visualize.py`.
 - Run `python -m pytest tests/test_splits.py -v` and `python -m pytest`.
-- Report changed files, split return structure, scaffold isolation test, test command, test result, and blockers.
+- Report changed files, diagnostics return structure, zero-leakage representation, visualization helper, test command, test result, and blockers.
 
-Do not implement split diagnostics, models, or benchmark code in MOL-MVP-006.
+Do not implement models, training, benchmark code, or notebooks in MOL-MVP-007.
