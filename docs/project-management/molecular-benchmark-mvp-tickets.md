@@ -57,7 +57,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-002 - Add Dataset Configuration And Raw Loading
 
-- **Status note:** Ready to start. MOL-MVP-002A resolved raw CSV availability.
+- **Status:** Complete. Dataset metadata, raw loading, normalization, and tests were accepted by review.
 - **Background:** MVP supports ESOL and FreeSolv, normalized to `{smiles, target}`.
 - **Owner role:** SWE
 - **Reviewer role:** ML Engineer
@@ -87,6 +87,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-003 - Add SMILES Validation And Preprocessing Script
 
+- **Status note:** Ready to start. MOL-MVP-002 is complete.
 - **Background:** Invalid molecules must be removed from processed data and remain inspectable.
 - **Owner role:** SWE
 - **Reviewer role:** ML Engineer

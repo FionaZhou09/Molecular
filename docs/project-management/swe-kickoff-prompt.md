@@ -11,7 +11,7 @@ Read these files before starting:
 2. `/Users/yingzhou/Documents/Molecular/docs/superpowers/plans/2026-07-01-molecular-property-prediction-benchmark.md`
 3. `/Users/yingzhou/Documents/Molecular/docs/project-management/molecular-benchmark-mvp-tickets.md`
 
-MOL-MVP-001 and MOL-MVP-002A are considered complete. Start with **MOL-MVP-002** only unless the manager explicitly assigns a different ticket.
+MOL-MVP-001, MOL-MVP-002A, and MOL-MVP-002 are considered complete. Start with **MOL-MVP-003** only unless the manager explicitly assigns a different ticket.
 
 Execution rules:
 - Implement one ticket at a time.
@@ -49,14 +49,19 @@ MVP order:
 14. MOL-MVP-013 - Add chemical space split visualization
 15. MOL-MVP-014 - Write README and reproducibility pass
 
-For MOL-MVP-002, do this:
-- Create `src/config.py` and `src/data_loader.py`.
-- Create `tests/test_config.py` and `tests/test_data_loader.py`.
-- Register `esol` and `freesolv` metadata with raw path, processed path, source note, expected row count, SMILES column, target column, and `task_type="regression"`.
-- Use actual raw columns from `data/raw/README.md`: ESOL `smiles` / `measured log solubility in mols per litre`; FreeSolv `smiles` / `y`.
-- Implement `load_raw_dataset(dataset_key: str) -> pandas.DataFrame`.
-- Implement `normalize_dataset(df, smiles_col, target_col) -> pandas.DataFrame`, returning exactly `smiles,target` and dropping missing SMILES or target rows.
-- Run `python -m pytest tests/test_config.py tests/test_data_loader.py -v`.
-- Report changed files, metadata keys and columns, test command, test result, and blockers.
+For MOL-MVP-003, do this:
+- Modify `src/data_loader.py`.
+- Create `scripts/preprocess_data.py`.
+- Extend `tests/test_data_loader.py`.
+- Implement `validate_smiles(df) -> tuple[pandas.DataFrame, pandas.DataFrame]` using RDKit `Chem.MolFromSmiles`.
+- Return valid rows and invalid rows separately; invalid molecules must not enter processed data.
+- Implement `save_processed_dataset(dataset_key, df)`.
+- Add a CLI accepting `--dataset esol` and `--dataset freesolv`.
+- The CLI should load raw data, normalize to `smiles,target`, validate SMILES, and save valid rows to `data/processed/<dataset>.csv`.
+- Processed CSV must contain only `smiles,target`.
+- Add tests for valid `CCO` and invalid `not_a_smiles`.
+- Run `python -m pytest tests/test_data_loader.py -v` and `python -m pytest`.
+- Optionally smoke test `python scripts/preprocess_data.py --dataset esol`.
+- Report changed files, validation behavior, test command, test result, CLI smoke test result, and blockers.
 
-Do not implement SMILES validation, featurization, models, or benchmark code in MOL-MVP-002.
+Do not implement featurization, splits, models, or benchmark code in MOL-MVP-003.
