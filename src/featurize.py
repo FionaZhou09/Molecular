@@ -31,6 +31,7 @@ DESCRIPTOR_COLUMNS = [
 ]
 
 SUPPORTED_FINGERPRINT_BITS = {512, 1024, 2048}
+DEFAULT_FINGERPRINT_BITS = 2048
 
 
 def _mol_from_smiles(smiles: str, index: int) -> Chem.Mol:
@@ -101,3 +102,36 @@ def compute_morgan_fingerprints(
         return np.empty((0, n_bits), dtype=np.uint8)
 
     return np.vstack(fingerprints)
+
+
+def build_feature_matrix(df: pd.DataFrame, feature_type: str) -> tuple[np.ndarray, list[str]]:
+    smiles_list = df["smiles"].tolist()
+
+    if feature_type == "descriptors":
+        descriptors = compute_descriptors(smiles_list)
+        return descriptors.to_numpy(), list(descriptors.columns)
+
+    if feature_type == "fingerprints":
+        fingerprints = compute_morgan_fingerprints(
+            smiles_list,
+            n_bits=DEFAULT_FINGERPRINT_BITS,
+        )
+        feature_names = [
+            f"morgan_{index}" for index in range(DEFAULT_FINGERPRINT_BITS)
+        ]
+        return fingerprints, feature_names
+
+    if feature_type == "combined":
+        descriptors = compute_descriptors(smiles_list)
+        fingerprints = compute_morgan_fingerprints(
+            smiles_list,
+            n_bits=DEFAULT_FINGERPRINT_BITS,
+        )
+        features = np.hstack([descriptors.to_numpy(), fingerprints])
+        feature_names = list(descriptors.columns) + [
+            f"morgan_{index}" for index in range(DEFAULT_FINGERPRINT_BITS)
+        ]
+        return features, feature_names
+
+    supported = "descriptors, fingerprints, combined"
+    raise ValueError(f"Unsupported feature_type: {feature_type!r}. Supported: {supported}")

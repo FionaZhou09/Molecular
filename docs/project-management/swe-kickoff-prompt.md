@@ -11,7 +11,7 @@ Read these files before starting:
 2. `/Users/yingzhou/Documents/Molecular/docs/superpowers/plans/2026-07-01-molecular-property-prediction-benchmark.md`
 3. `/Users/yingzhou/Documents/Molecular/docs/project-management/molecular-benchmark-mvp-tickets.md`
 
-MOL-MVP-001, MOL-MVP-002A, MOL-MVP-002, MOL-MVP-003, and MOL-MVP-004 are considered complete. Start with **MOL-MVP-005** only unless the manager explicitly assigns a different ticket.
+MOL-MVP-001, MOL-MVP-002A, MOL-MVP-002, MOL-MVP-003, MOL-MVP-004, and MOL-MVP-005 are considered complete. Start with **MOL-MVP-006** only unless the manager explicitly assigns a different ticket.
 
 Execution rules:
 - Implement one ticket at a time.
@@ -49,18 +49,16 @@ MVP order:
 14. MOL-MVP-013 - Add chemical space split visualization
 15. MOL-MVP-014 - Write README and reproducibility pass
 
-For MOL-MVP-005, do this:
-- Modify `src/featurize.py`.
-- Extend `tests/test_featurize.py`.
-- Implement `build_feature_matrix(df, feature_type)` with feature types `descriptors`, `fingerprints`, and `combined`.
-- Input `df` should contain at least a `smiles` column.
-- Return `(X, feature_names)`.
-- `descriptors` should return descriptor features and descriptor names.
-- `fingerprints` should return Morgan fingerprint features and bit names like `morgan_0`, `morgan_1`, ...
-- `combined` should concatenate descriptors and fingerprints in stable order.
-- Do not import, fit, or apply `StandardScaler` in `build_feature_matrix`; scaling is train-only and belongs to later model/train workflows.
-- Add tests for all three modes, feature name lengths, combined dimensions, and unsupported feature type errors.
-- Run `python -m pytest tests/test_featurize.py -v` and `python -m pytest`.
-- Report changed files, supported feature types, return structure, no-scaling check, test command, test result, and blockers.
+For MOL-MVP-006, do this:
+- Create `src/splits.py`.
+- Create `tests/test_splits.py`.
+- Implement `random_split(df, train_size=0.8, val_size=0.1, test_size=0.1, seed=42)`, returning train/validation/test index arrays.
+- Random split must be deterministic for the same seed, non-overlapping, and cover all rows exactly once.
+- Implement `compute_scaffold(smiles) -> str` using RDKit Bemis-Murcko scaffolds.
+- Implement `scaffold_split(df, train_size=0.8, val_size=0.1, test_size=0.1, seed=42)`, returning train/validation/test index arrays.
+- Scaffold split must ensure the same scaffold never crosses train/validation/test.
+- Add tests with duplicated scaffolds.
+- Run `python -m pytest tests/test_splits.py -v` and `python -m pytest`.
+- Report changed files, split return structure, scaffold isolation test, test command, test result, and blockers.
 
-Do not implement splits, models, or benchmark code in MOL-MVP-005.
+Do not implement split diagnostics, models, or benchmark code in MOL-MVP-006.

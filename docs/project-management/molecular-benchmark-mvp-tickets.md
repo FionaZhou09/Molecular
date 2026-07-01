@@ -117,7 +117,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-005 - Add Feature Matrix Builder With No Global Scaling
 
-- **Status note:** Ready to start. MOL-MVP-004 is complete.
+- **Status:** Complete. Feature matrix builder for descriptors, fingerprints, and combined features was accepted by review.
 - **Background:** Provide a single feature entrypoint while preventing descriptor scaling leakage.
 - **Owner role:** SWE
 - **Reviewer role:** ML Engineer
@@ -132,6 +132,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-006 - Implement Random And Scaffold Splits
 
+- **Status note:** Ready to start. MOL-MVP-005 is complete.
 - **Background:** Random split vs scaffold split is the project's central methodological comparison.
 - **Owner role:** SWE
 - **Reviewer role:** ML Reviewer
