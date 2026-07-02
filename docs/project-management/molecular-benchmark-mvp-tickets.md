@@ -252,7 +252,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-014 - Write README And Reproducibility Pass
 
-- **Status note:** Ready to start. MOL-MVP-013 is complete.
+- **Status:** Complete. README, pinned requirements, gitignore reproducibility pass, full tests, and documented smoke commands were accepted by review.
 - **Background:** Final MVP must be understandable and reproducible from a fresh clone.
 - **Owner role:** SWE
 - **Reviewer role:** Engineering Manager
@@ -359,6 +359,8 @@ Use this checklist for every ticket:
 - Are README commands copy-paste runnable from a fresh clone?
 
 ## Recommended Execution Order
+
+**MVP status:** Complete through MOL-MVP-014.
 
 1. MOL-MVP-001
 2. MOL-MVP-002A

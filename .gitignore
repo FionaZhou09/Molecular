@@ -4,3 +4,25 @@ __pycache__/
 .ipynb_checkpoints/
 .DS_Store
 
+# Local environments
+.venv/
+venv/
+env/
+.env
+
+# Notebook/editor clutter
+*.ipynb_checkpoints/
+.vscode/
+.idea/
+
+# Model artifacts and experiment trackers
+*.pt
+*.pth
+*.pkl
+*.joblib
+mlruns/
+wandb/
+
+# Temporary local outputs
+tmp/
+*.log
