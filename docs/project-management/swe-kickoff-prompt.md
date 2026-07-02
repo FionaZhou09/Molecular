@@ -11,7 +11,7 @@ Read these files before starting:
 2. `/Users/yingzhou/Documents/Molecular/docs/superpowers/plans/2026-07-01-molecular-property-prediction-benchmark.md`
 3. `/Users/yingzhou/Documents/Molecular/docs/project-management/molecular-benchmark-mvp-tickets.md`
 
-MOL-MVP-001 through MOL-MVP-012 are considered complete. Start with **MOL-MVP-013** only unless the manager explicitly assigns a different ticket.
+MOL-MVP-001 through MOL-MVP-013 are considered complete. Start with **MOL-MVP-014** only unless the manager explicitly assigns a different ticket.
 
 Execution rules:
 - Implement one ticket at a time.
@@ -49,19 +49,18 @@ MVP order:
 14. MOL-MVP-013 - Add chemical space split visualization
 15. MOL-MVP-014 - Write README and reproducibility pass
 
-For MOL-MVP-013, do this:
-- Modify `src/visualize.py` as needed.
-- Create or update `notebooks/03_analysis.ipynb`.
-- Use `data/processed/esol.csv` and `data/processed/freesolv.csv`.
-- Generate Morgan fingerprints and reduce them to 2D using UMAP or t-SNE.
-- Color points by train/validation/test assignment.
-- Compare random split and scaffold split visually.
-- Save chemical space figures for ESOL and FreeSolv using filenames like `results/figures/chemical_space_<dataset>_<split>.png`.
-- Fix the dimensionality-reduction seed.
-- Figure titles/labels must include dataset and split type.
-- Notebook should run top-to-bottom.
+For MOL-MVP-014, do this:
+- Modify `README.md`.
+- Modify `requirements.txt` if needed.
+- Modify `.gitignore` if needed.
+- Explain project motivation and key methodological point: random split can overestimate generalization compared with scaffold split.
+- Document setup, preprocessing, benchmark, and summary commands.
+- Include or reference result summary table and key figures.
+- Document fixed random seeds and reproducibility assumptions.
+- Pin dependency versions after checking the current environment, or clearly document any reproducibility caveat if pinning is not feasible.
+- Ensure `.gitignore` covers caches, notebook checkpoints, model artifacts, and generated clutter.
 - Run `python -m pytest`.
-- Verify chemical space figure files exist and are non-empty.
-- Report changed files, generated figures, dataset/split combinations, dimensionality-reduction method and seed, test command, test result, notebook execution status, and blockers.
+- Run at least one documented smoke command if feasible, such as `python scripts/run_benchmark.py --smoke` and `python scripts/summarize_results.py`.
+- Report changed files, README coverage, requirements pinning, gitignore changes, test command, test result, smoke command result, and blockers.
 
-Do not implement README polish, SHAP, feature importance, or error analysis in MOL-MVP-013.
+Do not implement portfolio polish tickets, optional tickets, SHAP, feature importance, error analysis, GNN, or classification extension in MOL-MVP-014.

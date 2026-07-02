@@ -3,9 +3,12 @@ import matplotlib
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+from sklearn.manifold import TSNE
 
-from src.splits import scaffold_sets_by_split
+from src.featurize import compute_morgan_fingerprints
+from src.splits import random_split, scaffold_sets_by_split, scaffold_split
 
 
 def plot_scaffold_counts(
@@ -221,3 +224,118 @@ def save_prediction_figures(
         outputs["residuals"].append(str(residual_path))
 
     return outputs
+
+
+def _split_assignments(df: pd.DataFrame, split_type: str, seed: int) -> pd.Series:
+    if split_type == "random":
+        train_idx, val_idx, test_idx = random_split(df, seed=seed)
+    elif split_type == "scaffold":
+        train_idx, val_idx, test_idx = scaffold_split(df, seed=seed)
+    else:
+        raise ValueError(
+            f"Unsupported split_type: {split_type!r}. Supported: random, scaffold"
+        )
+
+    assignments = pd.Series(index=df.index, dtype=object)
+    assignments.loc[train_idx] = "train"
+    assignments.loc[val_idx] = "validation"
+    assignments.loc[test_idx] = "test"
+    return assignments
+
+
+def _bounded_perplexity(n_samples: int, requested_perplexity: int) -> int:
+    if n_samples < 3:
+        raise ValueError("At least three rows are required for t-SNE chemical space")
+    return max(1, min(requested_perplexity, n_samples - 1))
+
+
+def build_chemical_space_dataframe(
+    df: pd.DataFrame,
+    split_type: str,
+    seed: int = 42,
+    n_bits: int = 512,
+    perplexity: int = 30,
+) -> pd.DataFrame:
+    fingerprints = compute_morgan_fingerprints(df["smiles"].tolist(), n_bits=n_bits)
+    tsne = TSNE(
+        n_components=2,
+        random_state=seed,
+        perplexity=_bounded_perplexity(len(df), perplexity),
+        init="random",
+        learning_rate="auto",
+    )
+    coordinates = tsne.fit_transform(fingerprints.astype(np.float32))
+    assignments = _split_assignments(df, split_type=split_type, seed=seed)
+
+    return pd.DataFrame(
+        {
+            "smiles": df["smiles"].to_numpy(),
+            "target": df["target"].to_numpy(dtype=float),
+            "split": assignments.to_numpy(),
+            "chemical_space_x": coordinates[:, 0],
+            "chemical_space_y": coordinates[:, 1],
+        }
+    )
+
+
+def plot_chemical_space(
+    chemical_space: pd.DataFrame,
+    dataset: str,
+    split_type: str,
+    ax=None,
+):
+    if ax is None:
+        _, ax = plt.subplots(figsize=(6, 5))
+
+    colors = {"train": "#4C78A8", "validation": "#F58518", "test": "#54A24B"}
+    for split_name in ["train", "validation", "test"]:
+        rows = chemical_space.loc[chemical_space["split"] == split_name]
+        if rows.empty:
+            continue
+        ax.scatter(
+            rows["chemical_space_x"],
+            rows["chemical_space_y"],
+            label=split_name,
+            alpha=0.7,
+            s=24,
+            color=colors[split_name],
+            edgecolors="none",
+        )
+
+    ax.set_xlabel("t-SNE 1")
+    ax.set_ylabel("t-SNE 2")
+    ax.set_title(f"Chemical space - {dataset.upper()} / {split_type}")
+    ax.legend(title="Split")
+    return ax
+
+
+def save_chemical_space_figure(
+    df: pd.DataFrame,
+    dataset: str,
+    split_type: str,
+    output_dir,
+    seed: int = 42,
+    n_bits: int = 512,
+    perplexity: int = 30,
+) -> str:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    chemical_space = build_chemical_space_dataframe(
+        df,
+        split_type=split_type,
+        seed=seed,
+        n_bits=n_bits,
+        perplexity=perplexity,
+    )
+    output_path = output_dir / f"chemical_space_{dataset}_{split_type}.png"
+
+    fig, ax = plt.subplots(figsize=(6.5, 5.5))
+    plot_chemical_space(
+        chemical_space,
+        dataset=dataset,
+        split_type=split_type,
+        ax=ax,
+    )
+    fig.tight_layout()
+    fig.savefig(output_path, dpi=160)
+    plt.close(fig)
+    return str(output_path)

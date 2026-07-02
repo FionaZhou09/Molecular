@@ -237,7 +237,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-013 - Add Chemical Space Split Visualization
 
-- **Status note:** Ready to start. MOL-MVP-012 is complete.
+- **Status:** Complete. Chemical space notebook, t-SNE split visualizations, figure outputs, and visualization tests were accepted by review.
 - **Background:** Visualize why scaffold split is stricter than random split.
 - **Owner role:** SWE
 - **Reviewer role:** ML Reviewer
@@ -252,6 +252,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-014 - Write README And Reproducibility Pass
 
+- **Status note:** Ready to start. MOL-MVP-013 is complete.
 - **Background:** Final MVP must be understandable and reproducible from a fresh clone.
 - **Owner role:** SWE
 - **Reviewer role:** Engineering Manager
