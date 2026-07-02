@@ -222,7 +222,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-012 - Add Benchmark Notebook And Prediction Plots
 
-- **Status note:** Ready to start. MOL-MVP-011 is complete.
+- **Status:** Complete. Benchmark notebook, predicted-vs-actual plots, residual plots, figure outputs, and visualization tests were accepted by review.
 - **Background:** Convert benchmark outputs into reviewer-friendly visuals.
 - **Owner role:** SWE
 - **Reviewer role:** ML Reviewer
@@ -237,6 +237,7 @@ Every ticket follows this workflow:
 
 ### MOL-MVP-013 - Add Chemical Space Split Visualization
 
+- **Status note:** Ready to start. MOL-MVP-012 is complete.
 - **Background:** Visualize why scaffold split is stricter than random split.
 - **Owner role:** SWE
 - **Reviewer role:** ML Reviewer

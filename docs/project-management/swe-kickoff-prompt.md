@@ -11,7 +11,7 @@ Read these files before starting:
 2. `/Users/yingzhou/Documents/Molecular/docs/superpowers/plans/2026-07-01-molecular-property-prediction-benchmark.md`
 3. `/Users/yingzhou/Documents/Molecular/docs/project-management/molecular-benchmark-mvp-tickets.md`
 
-MOL-MVP-001 through MOL-MVP-011 are considered complete. Start with **MOL-MVP-012** only unless the manager explicitly assigns a different ticket.
+MOL-MVP-001 through MOL-MVP-012 are considered complete. Start with **MOL-MVP-013** only unless the manager explicitly assigns a different ticket.
 
 Execution rules:
 - Implement one ticket at a time.
@@ -49,19 +49,19 @@ MVP order:
 14. MOL-MVP-013 - Add chemical space split visualization
 15. MOL-MVP-014 - Write README and reproducibility pass
 
-For MOL-MVP-012, do this:
+For MOL-MVP-013, do this:
 - Modify `src/visualize.py` as needed.
-- Create `notebooks/02_benchmark.ipynb`.
-- Use `results/benchmark_results.csv`, `results/benchmark_summary.csv`, and `results/predictions.csv`.
-- Notebook should show random vs scaffold benchmark comparison.
-- Add predicted-vs-actual scatter plots with identity line.
-- Add residual distribution plots.
-- Save at least one predicted-vs-actual figure for ESOL and one for FreeSolv using filenames like `results/figures/predicted_vs_actual_<dataset>_<model>_<split>.png`.
-- Figure titles/labels must include dataset/model/split.
+- Create or update `notebooks/03_analysis.ipynb`.
+- Use `data/processed/esol.csv` and `data/processed/freesolv.csv`.
+- Generate Morgan fingerprints and reduce them to 2D using UMAP or t-SNE.
+- Color points by train/validation/test assignment.
+- Compare random split and scaffold split visually.
+- Save chemical space figures for ESOL and FreeSolv using filenames like `results/figures/chemical_space_<dataset>_<split>.png`.
+- Fix the dimensionality-reduction seed.
+- Figure titles/labels must include dataset and split type.
 - Notebook should run top-to-bottom.
-- Prefer using existing predictions CSV; do not rerun the full benchmark unless necessary.
 - Run `python -m pytest`.
-- Verify figure files exist and are non-empty.
-- Report changed files, generated figures, dataset/model/split combinations, test command, test result, notebook execution status, and blockers.
+- Verify chemical space figure files exist and are non-empty.
+- Report changed files, generated figures, dataset/split combinations, dimensionality-reduction method and seed, test command, test result, notebook execution status, and blockers.
 
-Do not implement chemical space visualization, README polish, SHAP, or error analysis in MOL-MVP-012.
+Do not implement README polish, SHAP, feature importance, or error analysis in MOL-MVP-013.

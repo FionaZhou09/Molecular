@@ -28,64 +28,65 @@ GitHub repo：
 - MOL-MVP-009 已完成并通过 review；`src/models.py` 已有 PyTorch MLP regressor。
 - MOL-MVP-010 已完成并通过 review；`src/evaluate.py` 和 `src/train.py` 已有 metrics 与 single experiment runner。
 - MOL-MVP-011 已完成并通过 review；benchmark results、predictions、summary CSV 已在 `results/`。
+- MOL-MVP-012 已完成并通过 review；`notebooks/02_benchmark.ipynb` 和 prediction/residual figures 已存在。
 - 当前目录已连接 GitHub，但不要 commit，除非 manager 明确要求。
 
 你的任务：
 
-只执行 **MOL-MVP-012 - Add Benchmark Notebook And Prediction Plots**。
+只执行 **MOL-MVP-013 - Add Chemical Space Split Visualization**。
 
-不要做后续 ticket。不要实现 chemical space visualization、README polish、SHAP 或 error analysis。
+不要做后续 ticket。不要实现 README polish、SHAP、feature importance 或 error analysis。
 
-MOL-MVP-012 要求：
+MOL-MVP-013 要求：
 
 - Modify `src/visualize.py` as needed.
-- Create `notebooks/02_benchmark.ipynb`.
+- Create or update `notebooks/03_analysis.ipynb`.
 - Use existing outputs:
-  - `results/benchmark_results.csv`
-  - `results/benchmark_summary.csv`
-  - `results/predictions.csv`
-- Notebook should show random vs scaffold summary.
-- Add predicted-vs-actual scatter plot with identity line.
-- Add residual distribution plot.
-- At minimum, output one predicted-vs-actual figure for ESOL and one for FreeSolv.
+  - `data/processed/esol.csv`
+  - `data/processed/freesolv.csv`
+- Generate Morgan fingerprints.
+- Reduce fingerprints to 2D using UMAP or t-SNE.
+- Color points by train/validation/test assignment.
+- Compare random split and scaffold split visually.
+- At minimum, output chemical space figures for ESOL and FreeSolv.
 - Use output filenames like:
-  - `results/figures/predicted_vs_actual_<dataset>_<model>_<split>.png`
-  - optionally `results/figures/residuals_<dataset>_<model>_<split>.png`
-- Figure labels/titles must include dataset/model/split.
+  - `results/figures/chemical_space_<dataset>_<split>.png`
+- Fix the dimensionality-reduction seed.
+- Figure labels/titles must include dataset and split type.
 - Notebook should run top-to-bottom.
-- Do not rerun the full benchmark unless necessary; use `results/predictions.csv` where possible.
+- Do not implement SHAP or error analysis; those are polish tickets.
 
 执行流程：
 
 1. 检查当前 repo 状态和已有文件。
-2. 阅读 `results/benchmark_summary.csv` 和 `results/predictions.csv` schema。
-3. 实现 MOL-MVP-012。
+2. 阅读 `src/featurize.py` 和 `src/splits.py`，复用 Morgan fingerprints 和 split helpers。
+3. 实现 MOL-MVP-013。
 4. 运行：
 
 ```bash
 python -m pytest
 ```
 
-5. 验证 notebook 或 figure generation；如果用 notebook，至少确认它可以执行到生成 figures。
+5. 验证 notebook 或 figure generation；确认 chemical space figure files exist and are non-empty。
 
 6. 不要 commit，除非我明确要求。
 
 完成后请汇报：
 
 - 你创建或修改了哪些文件。
-- notebook 生成了哪些图。
-- 使用了哪些 dataset/model/split 组合。
+- chemical space notebook 生成了哪些图。
+- 使用了哪些 dataset/split combinations。
+- dimensionality reduction 使用的是 UMAP 还是 t-SNE，以及 seed。
 - 运行了什么测试命令。
 - 测试结果是什么。
 - 是否有 blocker。
-- 下一步建议是否进入 MOL-MVP-013。
+- 下一步建议是否进入 MOL-MVP-014。
 
 验收标准：
 
 - `python -m pytest` passes。
-- `notebooks/02_benchmark.ipynb` exists and can run top-to-bottom。
-- Notebook shows side-by-side or otherwise clear random vs scaffold comparison。
-- At least ESOL and FreeSolv each have one predicted-vs-actual figure。
-- Residual distributions are generated or shown。
+- `notebooks/03_analysis.ipynb` exists and can run top-to-bottom。
+- Chemical space plots compare random and scaffold split visually。
+- At least ESOL and FreeSolv each have chemical space figures。
 - Figure files exist and are non-empty。
-- 没有实现超出 MOL-MVP-012 范围的业务代码。
+- 没有实现超出 MOL-MVP-013 范围的业务代码。
