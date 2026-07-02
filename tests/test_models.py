@@ -1,8 +1,10 @@
 import numpy as np
 import pytest
+from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+from src.featurize import DESCRIPTOR_COLUMNS
 from src.models import MODEL_KEYS, MLPRegressorTorch, create_model
 
 
@@ -66,13 +68,60 @@ def test_create_model_returns_fit_predict_model(model_key):
     assert np.isfinite(predictions).all()
 
 
-@pytest.mark.parametrize("feature_type", ["descriptors", "combined"])
-def test_descriptor_like_features_use_train_time_standard_scaling(feature_type):
-    model = create_model("ridge", feature_type=feature_type, seed=123)
+def _tiny_combined_data():
+    descriptor_count = len(DESCRIPTOR_COLUMNS)
+    descriptor_features = np.tile(
+        np.array(
+            [
+                [0.0],
+                [1.0],
+                [2.0],
+                [3.0],
+                [4.0],
+                [5.0],
+            ],
+            dtype=float,
+        ),
+        (1, descriptor_count),
+    )
+    fingerprint_features = np.array(
+        [
+            [0.0, 1.0, 0.0, 1.0],
+            [1.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 1.0, 1.0],
+            [1.0, 1.0, 0.0, 0.0],
+            [0.0, 1.0, 1.0, 0.0],
+            [1.0, 0.0, 0.0, 1.0],
+        ],
+        dtype=float,
+    )
+    X = np.hstack([descriptor_features, fingerprint_features])
+    y = np.array([0.1, 1.2, 1.9, 3.1, 4.2, 4.9], dtype=float)
+    return X, y, fingerprint_features
+
+
+def test_descriptor_features_use_train_time_standard_scaling():
+    model = create_model("ridge", feature_type="descriptors", seed=123)
 
     assert isinstance(model, Pipeline)
     assert isinstance(model.named_steps["scaler"], StandardScaler)
     assert "model" in model.named_steps
+
+
+def test_combined_features_scale_descriptors_and_passthrough_fingerprints():
+    X, _, fingerprint_features = _tiny_combined_data()
+    descriptor_count = len(DESCRIPTOR_COLUMNS)
+
+    model = create_model("ridge", feature_type="combined", seed=123)
+    preprocessor = model.named_steps["preprocessor"]
+    transformed = preprocessor.fit_transform(X)
+
+    assert isinstance(model, Pipeline)
+    assert isinstance(preprocessor, ColumnTransformer)
+    assert preprocessor.transformers[0][2] == list(range(descriptor_count))
+    np.testing.assert_allclose(transformed[:, descriptor_count:], fingerprint_features)
+    assert set(np.unique(transformed[:, descriptor_count:])).issubset({0.0, 1.0})
+    assert not np.allclose(transformed[:, :descriptor_count], X[:, :descriptor_count])
 
 
 def test_fingerprint_features_do_not_use_standard_scaling():
@@ -140,6 +189,23 @@ def test_mlp_descriptor_pipeline_fits_and_predicts():
         epochs=80,
         learning_rate=0.05,
         patience=20,
+    )
+
+    model.fit(X, y)
+    predictions = model.predict(X)
+
+    assert predictions.shape == (len(y),)
+    assert np.isfinite(predictions).all()
+
+
+@pytest.mark.parametrize("model_key", MODEL_KEYS)
+def test_create_model_combined_features_fit_and_predict(model_key):
+    X, y, _ = _tiny_combined_data()
+    model = create_model(
+        model_key,
+        feature_type="combined",
+        seed=123,
+        **_model_kwargs(model_key),
     )
 
     model.fit(X, y)

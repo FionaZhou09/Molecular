@@ -265,6 +265,35 @@ Every ticket follows this workflow:
 - **Dependencies:** MOL-MVP-012, MOL-MVP-013
 - **Recommended commit message:** `docs: write readme and improve reproducibility`
 
+## Pre-Portfolio Fixes
+
+### MOL-FIX-001 - Fix Combined Feature Scaling
+
+- **Status:** Complete. Combined feature scaling now scales descriptor columns only and passes Morgan fingerprint columns through unchanged; tests and final review accepted the fix.
+- **Priority:** Blocking before resume/portfolio publication.
+- **Background:** Final review found that `feature_type="combined"` currently scales the full descriptor + fingerprint matrix. Descriptor columns should be scaled, but Morgan fingerprint bit columns should pass through unchanged.
+- **Owner role:** SWE
+- **Reviewer role:** ML Reviewer
+- **Input files:** `src/featurize.py`, `src/models.py`, `tests/test_models.py`
+- **Output files:** `src/models.py`, `tests/test_models.py`
+- **Implementation requirements:** Use descriptor count from `DESCRIPTOR_COLUMNS`; for combined features, scale descriptor indices only and passthrough Morgan fingerprint columns. Keep scaling train-only inside the model pipeline. Preserve `create_model(model_key, feature_type, seed, **kwargs)` unless there is a strong reason to change it.
+- **Testing requirements:** Add tests proving fingerprints are not scaled in combined mode, descriptors still scale, fingerprint-only features remain unscaled, and all models still fit/predict.
+- **Acceptance criteria:** `python -m pytest` passes; combined fingerprints remain binary after preprocessing/pipeline transformation; no benchmark APIs break.
+- **Recommended commit message:** `fix: avoid scaling fingerprint bits in combined features`
+
+### MOL-POLISH-README - Improve README Portfolio Story
+
+- **Priority:** High before resume/portfolio publication.
+- **Background:** Final review recommended improving README as a portfolio narrative, not just a reproducibility document.
+- **Owner role:** SWE / Technical Writer
+- **Reviewer role:** Engineering Manager
+- **Input files:** `README.md`, `results/benchmark_summary.csv`, `results/figures/*`
+- **Output files:** `README.md`
+- **Implementation requirements:** Strengthen the introduction, random-vs-scaffold explanation, figure references, key result interpretation, and interview-facing summary. Do not overclaim SOTA. Do not describe polish/optional work as complete.
+- **Testing requirements:** Run `python -m pytest`; check referenced figure paths exist.
+- **Acceptance criteria:** README explains project value in under 10 minutes, embeds or links key figures, preserves reproducible commands, and highlights methodology rigor.
+- **Recommended commit message:** `docs: polish portfolio narrative`
+
 ## Portfolio Polish Ticket List
 
 ### MOL-POLISH-001 - Add EDA Utilities And Notebook

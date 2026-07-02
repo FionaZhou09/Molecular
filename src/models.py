@@ -3,6 +3,7 @@ import random
 
 import numpy as np
 from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import Lasso, Ridge
 from sklearn.pipeline import Pipeline
@@ -11,10 +12,11 @@ import torch
 from torch import nn
 from xgboost import XGBRegressor
 
+from src.featurize import DESCRIPTOR_COLUMNS
+
 
 MODEL_KEYS = ("ridge", "lasso", "random_forest", "xgboost", "mlp")
 FEATURE_TYPES = ("descriptors", "fingerprints", "combined")
-SCALED_FEATURE_TYPES = {"descriptors", "combined"}
 
 
 def _validate_feature_type(feature_type: str) -> None:
@@ -222,10 +224,25 @@ def create_model(model_key: str, feature_type: str, seed: int = 42, **kwargs):
     _validate_feature_type(feature_type)
     estimator = _create_estimator(model_key, seed, **kwargs)
 
-    if feature_type in SCALED_FEATURE_TYPES:
+    if feature_type == "descriptors":
         return Pipeline(
             [
                 ("scaler", StandardScaler()),
+                ("model", estimator),
+            ]
+        )
+
+    if feature_type == "combined":
+        descriptor_indices = list(range(len(DESCRIPTOR_COLUMNS)))
+        preprocessor = ColumnTransformer(
+            [
+                ("descriptor_scaler", StandardScaler(), descriptor_indices),
+            ],
+            remainder="passthrough",
+        )
+        return Pipeline(
+            [
+                ("preprocessor", preprocessor),
                 ("model", estimator),
             ]
         )
